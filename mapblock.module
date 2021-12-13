@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Primarily Backdrop hooks for Map blocks.
+ */
+
+/**
+ * Implements hook_autoload_info().
+ */
+function mapblock_autoload_info() {
+  return array(
+    'BlockMap' => 'mapblock.block.inc',
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mapblock_theme() {
+  return array(
+    'mapblock_content' => array(
+      'render element' => 'elements',
+      'template' => 'mapblock-content',
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function mapblock_menu() {
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function mapblock_block_info() {
+  $blocks = array();
+  $default_info = t('A block for displaying a map.');
+  $blocks['default'] = array(
+    'info' => t('Map block'),
+    'description' => $default_info,
+    'class' => 'BlockMap',
+  );
+  // Map blocks are reusable.
+  $config_names = config_get_names_with_prefix('mapblock.block.');
+  foreach ($config_names as $config_name) {
+    $block = config_get($config_name);
+    $block_info = array();
+    $block_info['info'] = $block['label'];
+    $block_info['class'] = 'BlockMap';
+    $block_info['description'] = $default_info;
+    $blocks[$block['machine_name']] = $block_info;
+  }
+  return $blocks;
+}
+
+/**
+ * Load a single Map block by its machine name.
+ *
+ * Helper function for #machine_name form item.
+ */
+function mapblock_load($name = '') {
+  $block = config_get('mapblock.block.' . $name);
+  if (!$block) {
+    return FALSE;
+  }
+  return $block;
+}
+
+/**
+ * Implements template_preprocess_block().
+ */
+function mapblock_preprocess_block(&$variables) {
+  if ($variables['block']->module == 'mapblock') {
+    $variables['classes'][] = 'block-mapblock';
+    if ($variables['block']->delta == 'default') {
+      $machine_name = $variables['block']->settings['machine_name'];
+      $variables['classes'][] = backdrop_html_class('block-mapblock-' . $machine_name);
+    }
+  }
+}

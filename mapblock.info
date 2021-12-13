@@ -1,0 +1,9 @@
+name = Map Block
+description = Provides displaying map in a block.
+backdrop = 1.x
+type = module
+package = Other
+dependencies[] = views_json
+
+stylesheets[all][] = css/mapblock.css
+scripts[] = js/mapblock.js
